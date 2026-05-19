@@ -6,7 +6,7 @@ export const USULLER: Record<string, UsulPattern> = {
     timeSignature: '2/4',
     beats: [
       { stroke: 'Düm', noteValue: 'quarter' },
-      { stroke: 'Tek', noteValue: 'quarter' },
+      { stroke: 'Tek', noteValue: 'eighth' },
     ],
   },
   'Semâî': {
@@ -14,18 +14,17 @@ export const USULLER: Record<string, UsulPattern> = {
     timeSignature: '3/4',
     beats: [
       { stroke: 'Düm', noteValue: 'quarter' },
-      { stroke: 'Tek', noteValue: 'quarter' },
-      { stroke: 'Tek', noteValue: 'quarter' },
+      { stroke: 'Tek', noteValue: 'eighth' },
+      { stroke: 'Tek', noteValue: 'eighth' },
     ],
   },
   'Sofyan': {
     name: 'Sofyan',
     timeSignature: '4/4',
     beats: [
-      { stroke: 'Düm', noteValue: 'quarter' },
+      { stroke: 'Düm', noteValue: 'half' },
       { stroke: 'Tek', noteValue: 'quarter' },
-      { stroke: 'Düm', noteValue: 'quarter' },
-      { stroke: 'Tek', noteValue: 'quarter' },
+      { stroke: 'Kâ',  noteValue: 'quarter' },
     ],
   },
   'Türk Aksağı': {

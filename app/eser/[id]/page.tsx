@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ESERLER } from '@/data/eserler';
 import { USULLER } from '@/data/usuller';
-import UsulPatternDisplay from '@/components/UsulPattern';
+import UsulStaff from '@/components/UsulStaff';
 import AudioPlayer from '@/components/AudioPlayer';
 
 export function generateStaticParams() {
@@ -63,8 +63,18 @@ export default async function EserPage({ params }: Props) {
             )}
           </dl>
 
-          {/* Usul beat pattern */}
-          {pattern && <UsulPatternDisplay pattern={pattern} />}
+          {/* Usûl porte gösterimi */}
+          {pattern && (
+            <div className="mt-5">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                Usûl — {pattern.name} ({pattern.timeSignature})
+              </p>
+              <UsulStaff pattern={pattern} />
+            </div>
+          )}
+          {eser.usulPatternKey && !pattern && (
+            <p className="mt-4 text-sm text-gray-400">Usûl deseni henüz tanımlanmamış: {eser.usulPatternKey}</p>
+          )}
 
           {/* Audio */}
           {eser.audioPath && (
