@@ -69,7 +69,7 @@ export default async function EserPage({ params }: Props) {
               <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                 Usûl — {pattern.name} ({pattern.timeSignature})
               </p>
-              <UsulStaff pattern={pattern} />
+              <UsulStaff pattern={pattern} timeSignature={eser.timeSignatureOverride} />
             </div>
           )}
           {eser.usulPatternKey && !pattern && (

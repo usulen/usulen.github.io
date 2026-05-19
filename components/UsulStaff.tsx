@@ -1,204 +1,130 @@
 'use client';
 
-import { UsulPattern as UsulPatternType, NoteValue } from '@/lib/types';
+import { UsulPattern as UsulPatternType } from '@/lib/types';
 
 // ── Layout sabitleri ─────────────────────────────────────────────────────
-const STEM_LEN  = 34;              // stem uzunluğu (px)
-const STAFF_Y   = 50;              // portede çizginin y koordinatı
-const NRX       = 7.5;             // nota başı yatay yarıçap
-const NRY       = 5.5;             // nota başı dikey yarıçap
-const LEFT_PAD  = 62;              // zaman işareti için sol boşluk
-const RIGHT_PAD = 24;              // sağ kenar boşluğu
-const LABEL_Y   = STAFF_Y + STEM_LEN + NRY + 15; // vuruş etiketi y
-const SVG_H     = LABEL_Y + 14;   // toplam SVG yüksekliği
+const STEM_LEN  = 34;
+const STAFF_Y   = 50;
+const NRX       = 7.5;
+const NRY       = 5.5;
+const LEFT_PAD  = 52;
+const RIGHT_PAD = 24;
+const BEAT_W    = 72;
+const LABEL_Y   = STAFF_Y + STEM_LEN + NRY + 14;
+const SVG_H     = LABEL_Y + 14;
 
-// ── Nota değeri → sekizlik birim sayısı ──────────────────────────────────
-const NOTE_UNITS: Record<string, number> = {
-  'whole':          8,
-  'half':           4,
-  'dotted-quarter': 3,
-  'quarter':        2,
-  'dotted-eighth':  1.5,
-  'eighth':         1,
-  'sixteenth':      0.5,
-  'rest-quarter':   2,
-  'rest-eighth':    1,
-  'rest-sixteenth': 0.5,
-};
+// ── Nota değeri hesaplama ────────────────────────────────────────────────
+// duration: kaç denominator birimi
+// denominator: zaman işaretinin paydası (4, 8 vb.)
+// quarterUnits: dörtlük nota cinsinden süre
+//   = duration × 4 / denominator
+//
+// Örnek: 4/4'te duration=2  → 2×4/4 = 2 → yarım nota
+//        4/8'te duration=2  → 2×4/8 = 1 → dörtlük nota  ← otomatik uyum
 
-// Zaman işaretinden ölçüdeki toplam sekizlik birim sayısını hesapla
-function measureUnits(ts: string): number {
-  const [n, d] = ts.split('/').map(Number);
-  return n * (8 / d);
+type VisualNote =
+  | 'whole' | 'half' | 'dotted-quarter' | 'quarter'
+  | 'dotted-eighth' | 'eighth' | 'sixteenth';
+
+function noteFromDuration(duration: number, denominator: number): VisualNote {
+  const q = duration * 4 / denominator; // dörtlük birim cinsinden
+  if (q >= 4)    return 'whole';
+  if (q >= 2)    return 'half';
+  if (q >= 1.5)  return 'dotted-quarter';
+  if (q >= 1)    return 'quarter';
+  if (q >= 0.75) return 'dotted-eighth';
+  if (q >= 0.5)  return 'eighth';
+  return 'sixteenth';
 }
 
-// Açık nota başı mı? (yarım nota, tam nota)
-function isOpenHead(nv: NoteValue): boolean {
-  return nv === 'half' || nv === 'whole';
-}
-
-// Kaç bayrak var? (sekizlik=1, onaltılık=2)
-function flagCount(nv: NoteValue): number {
-  if (nv === 'eighth' || nv === 'dotted-eighth') return 1;
-  if (nv === 'sixteenth') return 2;
-  return 0;
-}
-
-// Kök yukarı mı? Düm → yukarı, diğerleri → aşağı
-function stemUp(stroke: string): boolean {
-  return stroke === 'Düm';
-}
+function isOpenHead(n: VisualNote)  { return n === 'whole' || n === 'half'; }
+function flagCount(n: VisualNote)   { return n === 'eighth' || n === 'dotted-eighth' ? 1 : n === 'sixteenth' ? 2 : 0; }
+function isDotted(n: VisualNote)    { return n === 'dotted-quarter' || n === 'dotted-eighth'; }
+function stemUp(stroke: string)     { return stroke === 'Düm'; }
 
 interface Props {
   pattern: UsulPatternType;
+  timeSignature?: string; // override (ör. '4/8' farklı eser için)
 }
 
-export default function UsulStaff({ pattern }: Props) {
-  const totalUnits = measureUnits(pattern.timeSignature);
+export default function UsulStaff({ pattern, timeSignature }: Props) {
+  const ts  = timeSignature ?? pattern.timeSignature;
+  const den = parseInt(ts.split('/')[1], 10);
+  const [numStr, denStr] = ts.split('/');
 
-  // Birim genişliğini ölçü uzunluğuna göre otomatik ayarla
-  const unitW = Math.min(78, Math.max(36, (680 - LEFT_PAD - RIGHT_PAD) / totalUnits));
-  const svgW  = LEFT_PAD + totalUnits * unitW + RIGHT_PAD;
-
-  // Vuruşları zaman pozisyonlarına yerleştir
-  type Beat = { stroke: string; nv: NoteValue; cx: number; units: number; up: boolean };
-  const beats: Beat[] = [];
-  let pos = 0;
-  for (const b of pattern.beats) {
-    const nv = (b.noteValue ?? 'quarter') as NoteValue;
-    const units = NOTE_UNITS[nv] ?? 1;
-    beats.push({ stroke: b.stroke, nv, cx: LEFT_PAD + pos * unitW, units, up: stemUp(b.stroke) });
-    pos += units;
-  }
-
-  const [numStr, denStr] = pattern.timeSignature.split('/');
+  const beatCount = pattern.beats.length;
+  const svgW = LEFT_PAD + beatCount * BEAT_W + RIGHT_PAD;
 
   return (
     <div className="overflow-x-auto">
       <svg
-        width={svgW}
-        height={SVG_H}
+        width={svgW} height={SVG_H}
         viewBox={`0 0 ${svgW} ${SVG_H}`}
         xmlns="http://www.w3.org/2000/svg"
-        style={{ display: 'block', minWidth: svgW }}
+        style={{ display: 'block' }}
       >
         {/* Zaman işareti */}
-        <text
-          x={LEFT_PAD / 2} y={STAFF_Y - 3}
-          textAnchor="middle" fontSize={18} fontWeight="bold"
-          fontFamily="Georgia, serif" fill="black"
-        >
-          {numStr}
-        </text>
-        <text
-          x={LEFT_PAD / 2} y={STAFF_Y + 15}
-          textAnchor="middle" fontSize={18} fontWeight="bold"
-          fontFamily="Georgia, serif" fill="black"
-        >
-          {denStr}
-        </text>
+        <text x={LEFT_PAD / 2} y={STAFF_Y - 3}  textAnchor="middle" fontSize={18} fontWeight="bold" fontFamily="Georgia,serif" fill="black">{numStr}</text>
+        <text x={LEFT_PAD / 2} y={STAFF_Y + 15} textAnchor="middle" fontSize={18} fontWeight="bold" fontFamily="Georgia,serif" fill="black">{denStr}</text>
 
         {/* Porte çizgisi */}
-        <line
-          x1={LEFT_PAD} y1={STAFF_Y}
-          x2={svgW - RIGHT_PAD} y2={STAFF_Y}
-          stroke="black" strokeWidth={1.5}
-        />
-
-        {/* Sol çizgi */}
-        <line
-          x1={LEFT_PAD} y1={STAFF_Y - 10}
-          x2={LEFT_PAD} y2={STAFF_Y + 10}
-          stroke="black" strokeWidth={1.5}
-        />
-
-        {/* Sağ çizgi */}
-        <line
-          x1={svgW - RIGHT_PAD} y1={STAFF_Y - 10}
-          x2={svgW - RIGHT_PAD} y2={STAFF_Y + 10}
-          stroke="black" strokeWidth={2}
-        />
+        <line x1={LEFT_PAD} y1={STAFF_Y} x2={svgW - RIGHT_PAD} y2={STAFF_Y} stroke="black" strokeWidth={1.5} />
+        <line x1={LEFT_PAD}             y1={STAFF_Y - 10} x2={LEFT_PAD}             y2={STAFF_Y + 10} stroke="black" strokeWidth={1.5} />
+        <line x1={svgW - RIGHT_PAD}     y1={STAFF_Y - 10} x2={svgW - RIGHT_PAD}     y2={STAFF_Y + 10} stroke="black" strokeWidth={2} />
 
         {/* Notalar */}
-        {beats.map((b, i) => {
-          const { cx, nv, up, stroke } = b;
-          const open  = isOpenHead(nv);
-          const flags = flagCount(nv);
+        {pattern.beats.map((b, i) => {
+          const nv   = noteFromDuration(b.duration, den);
+          const cx   = LEFT_PAD + i * BEAT_W + BEAT_W / 2;
+          const up   = stemUp(b.stroke);
+          const open = isOpenHead(nv);
+          const fc   = flagCount(nv);
+          const dot  = isDotted(nv);
 
-          // Kök x pozisyonu: yukarı kök → nota başının sağında, aşağı kök → solunda
-          const stemX = up ? cx + NRX * 0.75 : cx - NRX * 0.75;
-          // Kök uç noktaları
-          const stemTopY    = STAFF_Y - NRY * 0.5 - STEM_LEN;
-          const stemBotY    = STAFF_Y + NRY * 0.5 + STEM_LEN;
+          const stemX    = up ? cx + NRX * 0.75 : cx - NRX * 0.75;
+          const stemTopY = STAFF_Y - NRY * 0.5 - STEM_LEN;
+          const stemBotY = STAFF_Y + NRY * 0.5 + STEM_LEN;
 
-          // Bayrak yolları (Bezier eğrisi)
-          const flagPath = (offset: number) => {
-            if (up) {
-              // Yukarı kökte bayrak: kök tepesinden sağa ve aşağıya
-              const fy = stemTopY + offset;
-              return `M ${stemX},${fy} C ${stemX + 14},${fy + 10} ${stemX + 16},${fy + 22} ${stemX + 5},${fy + 30}`;
-            } else {
-              // Aşağı kökte bayrak: kök dibinden sağa ve yukarıya
-              const fy = stemBotY - offset;
-              return `M ${stemX},${fy} C ${stemX + 14},${fy - 10} ${stemX + 16},${fy - 22} ${stemX + 5},${fy - 30}`;
-            }
-          };
+          const flagPath = (offset: number) => up
+            ? `M ${stemX},${stemTopY + offset} C ${stemX+14},${stemTopY+offset+10} ${stemX+16},${stemTopY+offset+22} ${stemX+5},${stemTopY+offset+30}`
+            : `M ${stemX},${stemBotY - offset} C ${stemX+14},${stemBotY-offset-10} ${stemX+16},${stemBotY-offset-22} ${stemX+5},${stemBotY-offset-30}`;
 
-          const labelText = stroke === '-' ? '' : stroke.toUpperCase();
+          const label = b.stroke === '-' ? '' : b.stroke.toUpperCase();
 
           return (
             <g key={i}>
-              {/* Nota başı */}
-              {nv !== 'whole' ? (
-                <ellipse
-                  cx={cx} cy={STAFF_Y}
-                  rx={NRX} ry={NRY}
-                  fill={open ? 'white' : 'black'}
-                  stroke="black"
-                  strokeWidth={open ? 1.8 : 0}
-                  transform={`rotate(-12 ${cx} ${STAFF_Y})`}
-                />
+              {/* Susma işareti */}
+              {b.rest ? (
+                <text x={cx} y={STAFF_Y + 4} textAnchor="middle" fontSize={16} fontFamily="serif" fill="black">𝄾</text>
               ) : (
-                /* Tam nota: oval halka */
-                <g>
-                  <ellipse cx={cx} cy={STAFF_Y} rx={NRX + 1} ry={NRY} fill="white" stroke="black" strokeWidth={1.8} transform={`rotate(-12 ${cx} ${STAFF_Y})`} />
-                </g>
-              )}
-
-              {/* Nokta (noktalı notalar için) */}
-              {(nv === 'dotted-quarter' || nv === 'dotted-eighth') && (
-                <circle cx={cx + NRX + 5} cy={STAFF_Y - 2} r={2.5} fill="black" />
-              )}
-
-              {/* Kök (tam nota hariç) */}
-              {nv !== 'whole' && (
-                <line
-                  x1={stemX} y1={up ? STAFF_Y - NRY * 0.5 : STAFF_Y + NRY * 0.5}
-                  x2={stemX} y2={up ? stemTopY : stemBotY}
-                  stroke="black" strokeWidth={1.5}
-                />
-              )}
-
-              {/* Bayraklar */}
-              {flags >= 1 && (
-                <path d={flagPath(0)} fill="none" stroke="black" strokeWidth={2} strokeLinecap="round" />
-              )}
-              {flags >= 2 && (
-                <path d={flagPath(8)} fill="none" stroke="black" strokeWidth={2} strokeLinecap="round" />
+                <>
+                  {/* Nota başı */}
+                  <ellipse
+                    cx={cx} cy={STAFF_Y} rx={NRX} ry={NRY}
+                    fill={open ? 'white' : 'black'}
+                    stroke="black" strokeWidth={open ? 1.8 : 0}
+                    transform={`rotate(-12 ${cx} ${STAFF_Y})`}
+                  />
+                  {/* Nokta */}
+                  {dot && <circle cx={cx + NRX + 5} cy={STAFF_Y - 2} r={2.5} fill="black" />}
+                  {/* Kök */}
+                  {nv !== 'whole' && (
+                    <line
+                      x1={stemX} y1={up ? STAFF_Y - NRY * 0.5 : STAFF_Y + NRY * 0.5}
+                      x2={stemX} y2={up ? stemTopY : stemBotY}
+                      stroke="black" strokeWidth={1.5}
+                    />
+                  )}
+                  {/* Bayraklar */}
+                  {fc >= 1 && <path d={flagPath(0)} fill="none" stroke="black" strokeWidth={2} strokeLinecap="round" />}
+                  {fc >= 2 && <path d={flagPath(8)} fill="none" stroke="black" strokeWidth={2} strokeLinecap="round" />}
+                </>
               )}
 
               {/* Vuruş etiketi */}
-              {labelText && (
-                <text
-                  x={cx} y={LABEL_Y}
-                  textAnchor="middle"
-                  fontSize={11.5}
-                  fontWeight="700"
-                  fontFamily="system-ui, sans-serif"
-                  fill="black"
-                  letterSpacing="0.03em"
-                >
-                  {labelText}
+              {label && (
+                <text x={cx} y={LABEL_Y} textAnchor="middle" fontSize={11.5} fontWeight="700" fontFamily="system-ui,sans-serif" fill="black" letterSpacing="0.03em">
+                  {label}
                 </text>
               )}
             </g>
