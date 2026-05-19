@@ -1,8 +1,31 @@
-export type Stroke = 'Düm' | 'Tek' | 'Ke' | 'Te' | '-';
+export type NoteValue =
+  | 'whole'           // o
+  | 'half'            // 𝅗𝅥
+  | 'quarter'         // ♩
+  | 'dotted-quarter'  // ♩.
+  | 'eighth'          // ♪
+  | 'dotted-eighth'   // ♪.
+  | 'sixteenth'       // ♬
+  | 'rest-quarter'    // 𝄽
+  | 'rest-eighth'     // 𝄾
+  | 'rest-sixteenth'; // 𝄿
+
+export const NOTE_SYMBOLS: Record<NoteValue, string> = {
+  'whole':          '𝅝',
+  'half':           '𝅗𝅥',
+  'quarter':        '♩',
+  'dotted-quarter': '♩.',
+  'eighth':         '♪',
+  'dotted-eighth':  '♪.',
+  'sixteenth':      '♬',
+  'rest-quarter':   '𝄽',
+  'rest-eighth':    '𝄾',
+  'rest-sixteenth': '𝄿',
+};
 
 export interface UsulBeat {
-  stroke: Stroke;
-  label?: string; // optional sub-label (e.g. "Ka")
+  stroke: string;       // Düm | Tek | Te | Ke | - (veya özel)
+  noteValue?: NoteValue; // nota değeri
 }
 
 export interface UsulPattern {
