@@ -1,32 +1,24 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Geist } from 'next/font/google';
+import { Playfair_Display } from 'next/font/google';
+import './globals.css';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist-sans' });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Türk Müziği Usûlleri | Solfej Eğitim Sitesi",
-  description: "Türk Sanat Müziği usûllerini öğrenmek, öğretmek ve pratik yapmak için interaktif solfej eğitim sitesi.",
+  title: 'Türk Müziği | Usûl ve Solfej Eğitimi',
+  description: 'Türk Sanat Müziği usûllerini öğrenmek, öğretmek ve pratik yapmak için interaktif solfej eğitim sitesi.',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="tr" className={`${geist.variable} ${playfair.variable}`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

@@ -11,47 +11,46 @@ interface Props {
   onSearchChange: (v: string) => void;
 }
 
-export default function FilterBar({
-  makamlar,
-  usuller,
-  selectedMakam,
-  selectedUsul,
-  onMakamChange,
-  onUsulChange,
-  search,
-  onSearchChange,
-}: Props) {
-  const selectClass =
-    'rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200';
+const inputStyle: React.CSSProperties = {
+  background: '#FFFCF5',
+  border: '1px solid #E0D0B0',
+  borderRadius: '8px',
+  padding: '8px 12px',
+  fontSize: '13px',
+  color: '#1C0E0A',
+  outline: 'none',
+};
 
+export default function FilterBar({
+  makamlar, usuller,
+  selectedMakam, selectedUsul,
+  onMakamChange, onUsulChange,
+  search, onSearchChange,
+}: Props) {
   return (
     <div className="flex flex-wrap gap-3 items-center">
       <input
         type="search"
-        placeholder="Eser ara..."
+        placeholder="Eser, makam, bestekâr ara…"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
-        className={`${selectClass} min-w-[180px]`}
+        style={{ ...inputStyle, minWidth: 200 }}
       />
       <select
         value={selectedMakam}
         onChange={(e) => onMakamChange(e.target.value)}
-        className={selectClass}
+        style={inputStyle}
       >
         <option value="">Tüm Makamlar</option>
-        {makamlar.map((m) => (
-          <option key={m} value={m}>{m}</option>
-        ))}
+        {makamlar.map((m) => <option key={m} value={m}>{m}</option>)}
       </select>
       <select
         value={selectedUsul}
         onChange={(e) => onUsulChange(e.target.value)}
-        className={selectClass}
+        style={inputStyle}
       >
         <option value="">Tüm Usûller</option>
-        {usuller.map((u) => (
-          <option key={u} value={u}>{u}</option>
-        ))}
+        {usuller.map((u) => <option key={u} value={u}>{u}</option>)}
       </select>
     </div>
   );

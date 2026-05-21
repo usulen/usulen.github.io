@@ -18,8 +18,9 @@ export interface Eser {
   beste?: string;
   gufte?: string;
   form?: string;
-  scorePath?: string;
+  scorePaths?: string[];
   audioPath?: string;
+  youtubeId?: string;
   usulPatternKey: string;
   timeSignatureOverride?: string; // Eser farklı bir zaman işareti kullanıyorsa (ör. '4/8')
 }
