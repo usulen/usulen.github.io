@@ -13,7 +13,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: 'Türk Müziği | Usûl ve Solfej Eğitimi',
-  description: 'Türk Sanat Müziği usûllerini öğrenmek, öğretmek ve pratik yapmak için interaktif solfej eğitim sitesi.',
+  description: 'Türk müziği usûllerini öğrenmek, öğretmek ve pratik yapmak için interaktif solfej eğitim sitesi.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

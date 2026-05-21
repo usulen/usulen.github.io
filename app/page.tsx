@@ -45,7 +45,7 @@ export default function HomePage() {
               alt="Usûlen logo"
               width={200}
               height={200}
-              className="rounded-xl"
+              className="rounded-xl w-32 h-32 md:w-48 md:h-48"
               unoptimized
             />
             <p className="text-sm font-light tracking-[0.2em] uppercase"
@@ -58,7 +58,7 @@ export default function HomePage() {
 
       {/* ── İçerik ──────────────────────────────────────────────── */}
       {/* Manuscript sayfa wrapper */}
-      <div className="mx-auto px-8 py-8"
+      <div className="mx-auto px-4 py-4 md:px-8 md:py-8"
            style={{
              maxWidth: 1200,
              background: '#FFFCF5',
@@ -101,7 +101,7 @@ export default function HomePage() {
       {/* ── Alt bilgi ───────────────────────────────────────────── */}
       <footer className="py-8 text-center text-xs" style={{ color: '#9A7B5A', borderTop: '1px solid #E0D0B0', background: '#FFFCF5', maxWidth: 1200, margin: '0 auto' }}>
         <span style={{ color: '#C9963A' }}>❖</span>
-        <span className="mx-3">Türk Sanat Müziği Usûl ve Solfej Eğitimi</span>
+        <span className="mx-3">Türk Müziği Usûl ve Solfej Eğitimi</span>
         <span style={{ color: '#C9963A' }}>❖</span>
       </footer>
     </main>

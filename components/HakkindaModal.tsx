@@ -50,9 +50,10 @@ export default function HakkindaModal() {
           onClick={() => setOpen(false)}
         >
           <div
-            className="relative w-full rounded-2xl p-8"
+            className="relative w-full rounded-2xl p-6 md:p-8 overflow-y-auto"
             style={{
               maxWidth: 620,
+              maxHeight: '90vh',
               background: '#F5EDD8',
               border: '1px solid #D4C4A0',
               boxShadow: '0 8px 48px rgba(28,10,10,0.18)',

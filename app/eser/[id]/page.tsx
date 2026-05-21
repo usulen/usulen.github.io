@@ -38,7 +38,7 @@ export default async function EserPage({ params }: Props) {
             ← Geri
           </Link>
           <span style={{ color: '#C9963A55' }}>|</span>
-          <span className="text-sm truncate font-playfair" style={{ color: '#F5EDD8' }}>
+          <span className="hidden sm:inline text-sm truncate font-playfair" style={{ color: '#F5EDD8' }}>
             {num}. {eser.title}
           </span>
           <div className="ml-auto">
@@ -48,7 +48,7 @@ export default async function EserPage({ params }: Props) {
       </header>
 
       {/* ── Ana içerik — manuscript sayfa ───────────────────────── */}
-      <div className="mx-auto px-8 py-8"
+      <div className="mx-auto px-4 py-4 md:px-8 md:py-8"
            style={{
              maxWidth: 1400,
              minHeight: '90vh',
@@ -57,7 +57,7 @@ export default async function EserPage({ params }: Props) {
         {/* Sayfa başlığı */}
         <div className="flex items-start gap-3 mb-2">
           <span className="text-lg font-bold mt-1 shrink-0" style={{ color: '#C9963A' }}>{num}.</span>
-          <h1 className="font-playfair text-3xl font-bold leading-tight" style={{ color: '#1C0E0A' }}>
+          <h1 className="font-playfair text-2xl md:text-3xl font-bold leading-tight" style={{ color: '#1C0E0A' }}>
             {eser.title}
           </h1>
         </div>
@@ -73,7 +73,7 @@ export default async function EserPage({ params }: Props) {
         <div className="grid gap-8 lg:grid-cols-2 xl:grid-cols-[1fr_1.4fr] items-start">
 
           {/* SOL — Metadata + Usûl + Ses */}
-          <div className="space-y-6 sticky top-4">
+          <div className="space-y-6 lg:sticky lg:top-4">
 
             {/* Metadata */}
             <div className="rounded-xl p-5" style={{ background: '#EDE4CC', border: '1px solid #D4C4A0' }}>
@@ -167,7 +167,7 @@ export default async function EserPage({ params }: Props) {
       <footer className="py-6 text-center text-xs"
               style={{ color: '#9A7B5A', borderTop: '1px solid #D4C4A0', maxWidth: 1400, margin: '0 auto' }}>
         <span style={{ color: '#C9963A' }}>❖</span>
-        <span className="mx-3">Türk Sanat Müziği Usûl ve Solfej Eğitimi</span>
+        <span className="mx-3">Türk Müziği Usûl ve Solfej Eğitimi</span>
         <span style={{ color: '#C9963A' }}>❖</span>
       </footer>
     </main>

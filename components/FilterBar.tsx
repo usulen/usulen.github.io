@@ -28,30 +28,32 @@ export default function FilterBar({
   search, onSearchChange,
 }: Props) {
   return (
-    <div className="flex flex-wrap gap-3 items-center">
+    <div className="flex flex-col sm:flex-row gap-3">
       <input
         type="search"
         placeholder="Eser, makam, bestekâr ara…"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
-        style={{ ...inputStyle, minWidth: 200 }}
+        style={{ ...inputStyle, width: '100%' }}
       />
-      <select
-        value={selectedMakam}
-        onChange={(e) => onMakamChange(e.target.value)}
-        style={inputStyle}
-      >
-        <option value="">Tüm Makamlar</option>
-        {makamlar.map((m) => <option key={m} value={m}>{m}</option>)}
-      </select>
-      <select
-        value={selectedUsul}
-        onChange={(e) => onUsulChange(e.target.value)}
-        style={inputStyle}
-      >
-        <option value="">Tüm Usûller</option>
-        {usuller.map((u) => <option key={u} value={u}>{u}</option>)}
-      </select>
+      <div className="flex gap-3">
+        <select
+          value={selectedMakam}
+          onChange={(e) => onMakamChange(e.target.value)}
+          style={{ ...inputStyle, flex: 1, minWidth: 0 }}
+        >
+          <option value="">Tüm Makamlar</option>
+          {makamlar.map((m) => <option key={m} value={m}>{m}</option>)}
+        </select>
+        <select
+          value={selectedUsul}
+          onChange={(e) => onUsulChange(e.target.value)}
+          style={{ ...inputStyle, flex: 1, minWidth: 0 }}
+        >
+          <option value="">Tüm Usûller</option>
+          {usuller.map((u) => <option key={u} value={u}>{u}</option>)}
+        </select>
+      </div>
     </div>
   );
 }
