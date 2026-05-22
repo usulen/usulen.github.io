@@ -7,6 +7,7 @@ import UsulStaff from '@/components/UsulStaff';
 import AudioPlayer from '@/components/AudioPlayer';
 import KararSesiButton from '@/components/KararSesiButton';
 import HakkindaModal from '@/components/HakkindaModal';
+import ScoreImage from '@/components/ScoreImage';
 
 export function generateStaticParams() {
   return ESERLER.map((e) => ({ id: e.id }));
@@ -139,20 +140,7 @@ export default async function EserPage({ params }: Props) {
             {eser.scorePaths && eser.scorePaths.length > 0 ? (
               <div className="rounded-xl p-5" style={{ background: '#EDE4CC', border: '1px solid #D4C4A0' }}>
                 <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: '#9A7B5A' }}>Nota</p>
-                <div className="space-y-4">
-                  {eser.scorePaths.map((src, i) => (
-                    <Image
-                      key={i}
-                      src={src}
-                      alt={`${eser.title} notası${eser.scorePaths!.length > 1 ? ` (sayfa ${i + 1})` : ''}`}
-                      width={900}
-                      height={500}
-                      className="w-full h-auto rounded-lg"
-                      style={{ border: '1px solid #D4C4A0' }}
-                      unoptimized
-                    />
-                  ))}
-                </div>
+                <ScoreImage scorePaths={eser.scorePaths} title={eser.title} />
               </div>
             ) : (
               <div className="rounded-xl p-10 text-center text-sm h-full flex items-center justify-center"

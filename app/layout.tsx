@@ -18,7 +18,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="tr" className={`${geist.variable} ${playfair.variable}`}>
+    <html lang="tr" className={`${geist.variable} ${playfair.variable}`} style={{ colorScheme: 'light' }}>
+      <head>
+        <meta name="color-scheme" content="light" />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

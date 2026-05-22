@@ -94,6 +94,38 @@ export default function AudioPlayer({ youtubeId, title }: Props) {
     playing ? playerRef.current.pauseVideo() : playerRef.current.playVideo();
   };
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (!ready) return;
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          toggle();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          seek(-10);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          seek(10);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setVolume(v => { const nv = Math.min(100, v + 10); playerRef.current?.setVolume(nv); return nv; });
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          setVolume(v => { const nv = Math.max(0, v - 10); playerRef.current?.setVolume(nv); return nv; });
+          break;
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [ready, playing, duration]);
+
   const seek = (delta: number) => {
     if (!playerRef.current || !ready) return;
     const next = Math.max(0, Math.min((playerRef.current.getCurrentTime?.() ?? 0) + delta, duration));
@@ -130,16 +162,21 @@ export default function AudioPlayer({ youtubeId, title }: Props) {
       </p>
 
       {/* Progress bar */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs tabular-nums w-8 shrink-0" style={{ color: '#9A7B5A' }}>{fmt(current)}</span>
+      <div className="flex flex-col gap-0.5">
         <input
           type="range" min={0} max={duration || 1} step={1} value={current}
           onChange={onSeekBar}
           disabled={!ready}
-          className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer disabled:opacity-40"
-          style={{ accentColor: '#C9963A' }}
+          className="w-full h-1.5 rounded-full appearance-none cursor-pointer disabled:opacity-40"
+          style={{
+            accentColor: '#C9963A',
+            background: `linear-gradient(to right, #C9963A ${duration ? (current / duration) * 100 : 0}%, rgba(28,10,10,0.15) ${duration ? (current / duration) * 100 : 0}%)`,
+          }}
         />
-        <span className="text-xs tabular-nums w-8 shrink-0 text-right" style={{ color: '#9A7B5A' }}>{fmt(duration)}</span>
+        <div className="flex justify-between">
+          <span className="tabular-nums" style={{ fontSize: 10, color: '#9A7B5A' }}>{fmt(current)}</span>
+          <span className="tabular-nums" style={{ fontSize: 10, color: '#9A7B5A' }}>{fmt(duration)}</span>
+        </div>
       </div>
 
       {/* Kontroller */}
@@ -181,13 +218,21 @@ export default function AudioPlayer({ youtubeId, title }: Props) {
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 shrink-0" style={{ color: '#9A7B5A' }}>
             <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
           </svg>
-          <input
-            type="range" min={0} max={100} step={1} value={volume}
-            onChange={onVolume}
-            disabled={!ready}
-            className="w-20 h-1.5 rounded-full appearance-none cursor-pointer disabled:opacity-40"
-            style={{ accentColor: '#C9963A' }}
-          />
+          <div className="flex flex-col gap-0.5">
+            <input
+              type="range" min={0} max={100} step={1} value={volume}
+              onChange={onVolume}
+              disabled={!ready}
+              className="w-20 h-1.5 rounded-full appearance-none cursor-pointer disabled:opacity-40"
+              style={{
+                accentColor: '#C9963A',
+                background: `linear-gradient(to right, #C9963A ${volume}%, rgba(28,10,10,0.15) ${volume}%)`,
+              }}
+            />
+            <span className="text-center tabular-nums" style={{ fontSize: 10, color: '#9A7B5A' }}>
+              {volume}%
+            </span>
+          </div>
         </div>
       </div>
     </div>
